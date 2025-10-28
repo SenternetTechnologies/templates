@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Donate for a Cause</title>
+    <title>One Rupee Payment Gateway</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -17,53 +17,38 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
-    <!-- Donation Card Container -->
+    <!-- Payment Card Container -->
     <div class="w-full max-w-lg bg-white shadow-xl rounded-xl p-8 md:p-10 border border-gray-100">
 
-        <!-- Header and Logo/Icon -->
+        <!-- Header and Icon -->
         <div class="text-center mb-8">
-            <!-- Icon/Logo Placeholder -->
-            <div class="text-indigo-600 text-5xl mb-4">
-                &#10084; <!-- Simple heart symbol for charity -->
+            <!-- Icon/Logo Placeholder (Changed to a checkmark for transactional feel) -->
+            <div class="text-green-600 text-5xl mb-4">
+                &#10003; 
             </div>
-            <h1 class="text-3xl font-bold text-gray-800">Support Our Mission</h1>
-            <p class="text-gray-500 mt-2">Your contribution makes a difference.</p>
+            <h1 class="text-3xl font-bold text-gray-800">Complete Your Payment</h1>
+            <p class="text-gray-500 mt-2">Final step to complete your transaction.</p>
         </div>
 
-        <!-- Donation Purpose Text -->
-        <div class="mb-6 bg-indigo-50 border-l-4 border-indigo-500 text-indigo-800 p-4 rounded-lg">
-            <p class="font-medium">Every rupee donated goes directly to providing essential supplies to those in need.</p>
+        <!-- Payment Purpose Text -->
+        <div class="mb-8 bg-green-50 border-l-4 border-green-500 text-green-800 p-4 rounded-lg">
+            <p class="font-medium">This transaction requires a fixed payment of **one rupee (₹1.00)**.</p>
         </div>
 
-        <!-- Amount Input Field -->
-        <div class="mb-6">
-            <label for="donationAmount" class="block text-sm font-medium text-gray-700 mb-2">Enter Donation Amount (INR)</label>
-            <input type="number" id="donationAmount" min="1" placeholder="Minimum ₹1"
-                   class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-lg font-semibold transition duration-150 ease-in-out"
-                   value="100">
+        <!-- Static Amount Display (Replaces Input Field) -->
+        <div class="mb-10 text-center border-b pb-6">
+            <p class="text-sm font-medium text-gray-700 mb-3">Amount Due</p>
+            <p class="text-6xl font-extrabold text-gray-900">₹1.00</p>
         </div>
 
-        <!-- Quick Donate Buttons -->
-        <div class="flex flex-wrap gap-3 mb-8">
-            <button onclick="setAmount(50)" class="flex-1 px-4 py-2 text-sm font-medium rounded-full bg-gray-200 text-gray-700 hover:bg-indigo-100 transition duration-150 ease-in-out shadow-sm">₹50</button>
-            <button onclick="setAmount(100)" class="flex-1 px-4 py-2 text-sm font-medium rounded-full bg-gray-200 text-gray-700 hover:bg-indigo-100 transition duration-150 ease-in-out shadow-sm">₹100</button>
-            <button onclick="setAmount(500)" class="flex-1 px-4 py-2 text-sm font-medium rounded-full bg-gray-200 text-gray-700 hover:bg-indigo-100 transition duration-150 ease-in-out shadow-sm">₹500</button>
-            <button onclick="setAmount(1000)" class="flex-1 px-4 py-2 text-sm font-medium rounded-full bg-gray-200 text-gray-700 hover:bg-indigo-100 transition duration-150 ease-in-out shadow-sm">₹1000</button>
-        </div>
-        
-        <!-- Error Message Box (Hidden by default) -->
-        <div id="errorMessage" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
-            <p class="font-bold">Invalid Amount</p>
-            <p class="text-sm">Please enter a valid donation amount greater than or equal to ₹1.</p>
-        </div>
-
-        <!-- Donate Button -->
-        <button id="donateButton"
-                onclick="redirectToUPI()"
-                class="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-bold rounded-xl shadow-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-[1.01] active:scale-[0.99]"
+        <!-- Static Payment Link (Fixed to ₹1.00) -->
+        <!-- The UPI link is set with am=1.00 and is directly encoded into the href attribute. -->
+        <a href="upi://pay?pa=9360291050@ibl&pn=Senternet%20technologies&cu=INR&am=1.00"
+           id="payLink"
+           class="w-full flex items-center justify-center px-6 py-4 border border-transparent text-lg font-bold rounded-xl shadow-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-[1.01] active:scale-[0.99]"
         >
-            Donate Now (via UPI)
-        </button>
+            Pay ₹1.00 Now (via UPI)
+        </a>
 
         <p class="text-center text-xs text-gray-400 mt-4">
             <span class="font-mono">Payee: Senternet technologies | VPA: 9360291050@ibl</span>
@@ -72,66 +57,8 @@
     </div>
 
     <script>
-        // Use the VPA and name provided by the user
-        const VPA = "9360291050@ibl";
-        const PAYEE_NAME = "Senternet technologies";
-        const CURRENCY = "INR";
-        const MIN_AMOUNT = 1;
-
-        const amountInput = document.getElementById('donationAmount');
-        const errorMessage = document.getElementById('errorMessage');
-
-        /**
-         * Sets a predefined amount in the input field.
-         * @param {number} amount - The quick-set amount.
-         */
-        function setAmount(amount) {
-            amountInput.value = amount;
-            // Optionally, clear error message when user interacts
-            errorMessage.classList.add('hidden');
-        }
-
-        /**
-         * Generates the UPI deep link and redirects the user.
-         */
-        function redirectToUPI() {
-            const amount = parseFloat(amountInput.value);
-
-            // 1. Validation
-            if (isNaN(amount) || amount < MIN_AMOUNT) {
-                errorMessage.classList.remove('hidden');
-                return;
-            }
-
-            // Hide error message if validation passed
-            errorMessage.classList.add('hidden');
-            
-            // Format the amount to two decimal places (e.g., 100 becomes 100.00)
-            const formattedAmount = amount.toFixed(2);
-
-            // 2. Construct the UPI URL
-            // The template uses the dynamic formattedAmount
-            const upiUrl = `upi://pay?pa=${VPA}&pn=${encodeURIComponent(PAYEE_NAME)}&cu=${CURRENCY}&am=${formattedAmount}`;
-
-            // Log for debugging (optional)
-            console.log("Generated UPI URL:", upiUrl);
-
-            // 3. Redirect to the UPI link
-            window.location.href = upiUrl;
-            
-            // Note: On desktop browsers, this may show an error/prompt, 
-            // but on mobile, it will automatically open the relevant UPI app.
-        }
-
-        // Set an initial amount when the page loads
-        window.onload = () => {
-             // Ensure the initial value is parsed correctly
-            if (amountInput.value) {
-                setAmount(parseFloat(amountInput.value));
-            }
-        };
-
+        // The script block is now empty since the payment amount is fixed,
+        // and no JavaScript is needed to generate the UPI link dynamically.
     </script>
 </body>
 </html>
-
