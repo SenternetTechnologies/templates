@@ -3,493 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quick Checkout Store</title>
+    <title>Coin Recharge</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
-        /* Custom styles for better aesthetics */
-        .card {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s;
+        /* Custom styles for a cleaner look */
+        .coin-option {
+            transition: background-color 0.2s;
         }
-        .card:hover {
-            transform: translateY(-2px);
-        }
-        .input-field {
-            @apply w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500;
+        .coin-option:hover {
+            background-color: #f7f7f7;
         }
     </style>
 </head>
-<body class="p-4 sm:p-8">
-    <!-- Firebase SDK Imports -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, collection, getDocs, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+<body class="bg-gray-50 min-h-screen">
 
-        setLogLevel('Debug'); // Enable detailed Firebase logging
-
-        // Global variables MUST be present in the canvas environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        let app, db, auth, userId;
-
-        window.firebaseInit = async () => {
-            try {
-                if (Object.keys(firebaseConfig).length === 0) {
-                    throw new Error("Firebase configuration is missing or empty.");
-                }
-                
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                userId = auth.currentUser?.uid || crypto.randomUUID();
-                
-                // Expose instances globally for the main script
-                window.db = db;
-                window.auth = auth;
-                window.userId = userId;
-
-                // Now that Firebase is ready, initialize the store logic
-                window.initProducts();
-
-            } catch (error) {
-                console.error("Firebase Initialization Error:", error);
-                window.showMessage("Setup Error", `Could not initialize the app. Check console for details. Error: ${error.message}`);
-            }
-        };
-
-        window.firebaseInit();
-    </script>
-    
-    <div class="max-w-4xl mx-auto">
-        <header class="text-center py-6 mb-8 border-b-2 border-indigo-100">
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-indigo-700">QuickBuy Electronics</h1>
-            <p class="text-gray-500 mt-1">Select your products and proceed to payment.</p>
+    <div class="max-w-md mx-auto bg-white shadow-lg sm:rounded-xl">
+        
+        <header class="p-4 flex justify-between items-center border-b border-gray-100">
+            <div class="flex items-center space-x-2">
+                <img src="https://via.placeholder.com/40" alt="User Profile" class="w-10 h-10 rounded-full object-cover">
+                <div class="flex items-center space-x-1">
+                    <span class="font-semibold text-gray-900">MRxxLo...</span>
+                    <span class="text-xs bg-purple-500 text-white rounded-full px-2 py-0.5">49</span>
+                </div>
+            </div>
+            <a href="#" class="text-red-500 font-medium text-sm">Logout</a>
         </header>
 
-        <!-- Product Listing -->
-        <div id="product-list" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <!-- Products will be injected here by JavaScript -->
-        </div>
-
-        <!-- Customer Details Form -->
-        <div id="customer-form-section" class="bg-white p-6 rounded-xl card border border-indigo-200 mb-8">
-            <h2 class="text-2xl font-bold mb-4 text-indigo-800">1. Customer Information</h2>
-            <form id="customer-form" onsubmit="return false;">
-                <div class="space-y-4">
-                    <input type="text" id="cust-name" class="input-field" placeholder="Full Name" required>
-                    <input type="tel" id="cust-phone" class="input-field" placeholder="Phone Number" required>
-                    <textarea id="cust-address" class="input-field resize-none h-24" placeholder="Delivery Address" required></textarea>
-                </div>
-            </form>
-        </div>
-
-
-        <!-- Order Summary and Checkout Section -->
-        <div class="bg-white p-6 rounded-xl card border border-indigo-200">
-            <h2 class="text-2xl font-bold mb-4 text-indigo-800">2. Order Summary & Payment</h2>
-
-            <div class="flex justify-between text-xl font-semibold mb-6 border-t pt-4 border-gray-100">
-                <span>Total Amount:</span>
-                <span id="total-amount" class="text-indigo-600">₹0.00</span>
+        <div id="sid-input-section" class="p-4 border-b border-gray-100">
+            <h3 class="font-semibold mb-2 text-gray-700">Enter Starmaker SID</h3>
+            <div class="flex flex-col space-y-3">
+                <input type="text" id="user_sid_input" placeholder="Enter your Starmaker SID number" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                <button onclick="handleSIDConfirmation()" id="confirm-btn" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition duration-150 shadow-md">
+                    Confirm
+                </button>
             </div>
+        </div>
+        
+        <div id="sid-confirmation-message" class="hidden p-4 bg-green-100 text-green-700 text-sm font-medium rounded-b-xl transition-all duration-300">
+            <p>✅ SID **<span id="confirmed-sid"></span>** is confirmed. Please select a recharge option below.</p>
+        </div>
 
-            <div id="checkout-container">
-                <p class="text-gray-600 mb-3">Choose your checkout method:</p>
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <button onclick="checkout('upi')" id="upi-button" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition duration-200 shadow-md shadow-green-200 disabled:opacity-50" disabled>
-                        Pay Online (UPI)
-                    </button>
-                    <button onclick="checkout('cod')" class="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg transition duration-200 shadow-md shadow-indigo-200 disabled:opacity-50" disabled>
-                        Cash on Delivery
-                    </button>
+
+        <div id="recharge-section" class="hidden p-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-gray-800">Recharge Option</h2>
+                <div class="flex items-center space-x-1 text-sm text-gray-500">
+                    <span>India</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
                 </div>
             </div>
 
-            <!-- Order Confirmation & Verification Area -->
-            <div id="confirmation-area" class="hidden mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 rounded-lg">
-                <p class="font-semibold text-lg mb-2">Order Processing...</p>
-                <!-- Content will be dynamically set by checkout() -->
+            <div class="p-3 mb-4 flex justify-between items-center bg-gray-100 rounded-lg relative">
+                <div class="flex items-center space-x-3">
+                    <img src="https://via.placeholder.com/20/0000FF/FFFFFF?text=P" alt="Paytm Icon" class="w-5 h-5">
+                    <img src="https://via.placeholder.com/20/00FF00/FFFFFF?text=G" alt="GPay Icon" class="w-5 h-5">
+                    <span class="font-medium text-gray-800">UPI</span>
+                </div>
+                <span class="text-sm text-yellow-600 font-semibold">100 INR = 🪙84</span>
+                <div class="absolute top-0 right-0 bg-orange-500 text-white text-xs font-semibold px-2 py-0.5 rounded-tr-lg rounded-bl-lg">
+                    Last Used
+                </div>
             </div>
+            
+            <p class="text-sm text-gray-500 mb-4 text-center">Only a few orders might receive coins late within hours, please don't worry.</p>
+
+            <div id="coin-options-list" class="space-y-2">
+                </div>
+        </div>
+
+    </div>
+
+    <div id="upi-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full">
+            <h3 class="text-lg font-bold mb-4 text-gray-800">UPI Payment Link Generated</h3>
+            <p class="text-sm mb-4 text-gray-600">Click the button to open your UPI app for payment. The SID is embedded in the link.</p>
+            <div class="bg-yellow-50 p-3 rounded-lg mb-4 break-words">
+                <p class="text-xs font-mono text-yellow-700" id="generated-upi-link">Link will appear here...</p>
+            </div>
+            <a id="upi-link-btn" href="#" target="_blank" class="block w-full text-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition duration-150">
+                Open UPI App for ₹<span id="link-amount">0</span>
+            </a>
+            <button onclick="document.getElementById('upi-modal').classList.add('hidden')" class="mt-4 w-full text-sm text-gray-500 hover:text-gray-700">Close</button>
         </div>
     </div>
 
-    <!-- Message Box (replaces alert/confirm) -->
-    <div id="message-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-xl max-w-sm w-full card">
-            <h3 id="modal-title" class="text-xl font-bold mb-3 text-indigo-700">Message</h3>
-            <p id="modal-body" class="text-gray-700 mb-4"></p>
-            <button onclick="closeModal()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 rounded-lg">Close</button>
-        </div>
-    </div>
 
     <script>
-        // --- Configuration ---
-        const UPI_VPA = "9360291050@ibl";
-        const PAYEE_NAME = "Senternettechnologies";
-        const EMAIL_TO_SEND_TO = "senthil.itsolutions@gmail.com";
-        const ORDER_COLLECTION_PATH = (appId) => `/artifacts/${appId}/public/data/orders`;
-
-        // Hardcoded product list
-        const products = [
-            { id: 101, name: "Premium Laptop Stand", price: 1500, description: "Ergonomic aluminum stand for 13-17 inch laptops." },
-            { id: 202, name: "Wireless Earbuds Pro", price: 2500, description: "Active Noise Cancellation with 24-hour battery life." },
-            { id: 303, name: "Portable Power Bank 20K", price: 999, description: "Fast-charging 20,000mAh external battery pack." },
-            { id: 404, name: "Mechanical Keyboard (Blue)", price: 3499, description: "Tactile blue switches for satisfying typing." }
+        const COIN_DATA = [
+            { coins: 42, discount: "16.00% off", amount: 50, sid: "" },
+            { coins: 84, discount: "16.00% off", amount: 100, sid: "" },
+            { coins: 429, discount: "18.45% off", amount: 500, sid: "" },
+            { coins: 871, discount: "20.38% off", amount: 1000, sid: "" },
+            { coins: 4421, discount: "22.35% off", amount: 5000, sid: "" },
+            { coins: 8842, discount: "22.34% off", amount: 10000, sid: "" },
+            { coins: 17820, discount: "23.31% off", amount: 20000, sid: "" },
         ];
 
-        // Global state
-        let cart = {};
-        let currentOrderId = null; // Store the current order ID
+        let confirmedSID = '';
 
-        // --- Utility Functions ---
+        // Function to handle the SID confirmation button click
+        function handleSIDConfirmation() {
+            const sidInput = document.getElementById('user_sid_input');
+            const sid = sidInput.value.trim();
+            const sidConfirmMsg = document.getElementById('sid-confirmation-message');
+            const rechargeSection = document.getElementById('recharge-section');
+            const confirmBtn = document.getElementById('confirm-btn');
 
-        function showMessage(title, message) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-body').innerHTML = message;
-            document.getElementById('message-modal').classList.remove('hidden');
-        }
+            if (sid.length > 5) { // Basic length check for a 'valid' SID
+                confirmedSID = sid;
+                
+                // Simulate success
+                document.getElementById('confirmed-sid').textContent = sid;
+                sidConfirmMsg.classList.remove('hidden');
+                rechargeSection.classList.remove('hidden');
 
-        function closeModal() {
-            document.getElementById('message-modal').classList.add('hidden');
-        }
+                confirmBtn.textContent = 'Confirmed';
+                confirmBtn.disabled = true;
+                sidInput.disabled = true;
+                sidInput.classList.add('bg-gray-100');
+                
+                // Scroll to recharge section for better UX on mobile
+                rechargeSection.scrollIntoView({ behavior: 'smooth' });
 
-        function urlEncode(str) {
-            // Replaces spaces with '' (as requested) then URL-encodes the rest
-            const cleanStr = str.replace(/\s+/g, '');
-            return encodeURIComponent(cleanStr);
-        }
-
-        function generateUniqueOrderId() {
-            // Simple short ID based on timestamp and a random number
-            return 'ORD' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
-        }
-        
-        function getCustomerDetails() {
-            const name = document.getElementById('cust-name').value.trim();
-            const phone = document.getElementById('cust-phone').value.trim();
-            const address = document.getElementById('cust-address').value.trim();
-
-            if (!name || !phone || !address) {
-                return null;
-            }
-            return { name, phone, address };
-        }
-
-        // --- Core Logic ---
-
-        /**
-         * Calculates the total amount and updates the cart display.
-         */
-        function calculateTotal() {
-            let total = 0;
-            let itemsInCart = false;
-
-            for (const product of products) {
-                const quantity = cart[product.id] || 0;
-                if (quantity > 0) {
-                    total += quantity * product.price;
-                    itemsInCart = true;
-                }
-            }
-
-            const totalAmountEl = document.getElementById('total-amount');
-            totalAmountEl.innerText = `₹${total.toFixed(2)}`;
-
-            const upiButton = document.getElementById('upi-button');
-            const codButton = document.querySelector('[onclick="checkout(\'cod\')"]');
-
-            if (itemsInCart) {
-                upiButton.disabled = false;
-                codButton.disabled = false;
-                totalAmountEl.classList.add('text-green-600');
-                totalAmountEl.classList.remove('text-indigo-600');
             } else {
-                upiButton.disabled = true;
-                codButton.disabled = true;
-                totalAmountEl.classList.remove('text-green-600');
-                totalAmountEl.classList.add('text-indigo-600');
-            }
-
-            return total;
-        }
-
-        /**
-         * Updates the quantity for a specific product.
-         */
-        function updateQuantity(productId, quantity) {
-            const qty = parseInt(quantity);
-            cart[productId] = Math.max(0, qty); // Ensure quantity is non-negative
-            calculateTotal();
-        }
-
-        /**
-         * Generates the UPI deep link with dynamic amount and transaction note.
-         */
-        function generateUpiLink(amount) {
-            if (amount <= 0 || !currentOrderId) return null;
-
-            let transactionNote = '';
-            for (const product of products) {
-                const quantity = cart[product.id] || 0;
-                if (quantity > 0) {
-                    // Append name (no spaces) + ID, repeated for quantity
-                    const cleanName = product.name.replace(/\s+/g, '');
-                    for (let i = 0; i < quantity; i++) {
-                       transactionNote += `${cleanName}${product.id}`;
-                    }
-                }
-            }
-
-            // Append the Order ID for unique transaction tracking
-            transactionNote += `ORDERID${currentOrderId}`;
-
-            const encodedNote = urlEncode(transactionNote);
-
-            // Construct the UPI link
-            const upiLink = `upi://pay?pa=${UPI_VPA}&pn=${PAYEE_NAME}&cu=INR&am=${amount.toFixed(2)}&tn=${encodedNote}`;
-
-            return upiLink;
-        }
-
-        /**
-         * Saves the order data to Firestore.
-         */
-        async function saveOrder(orderData, orderId) {
-            if (!window.db || !window.auth) {
-                console.error("Firebase not initialized.");
-                return;
-            }
-            try {
-                const orderRef = doc(window.db, ORDER_COLLECTION_PATH(appId), orderId);
-                await setDoc(orderRef, orderData);
-                console.log("Order successfully saved to Firestore with ID:", orderId);
-            } catch (error) {
-                console.error("Error saving order:", error);
-                showMessage("Database Error", "Failed to save the order to the database. Please try again.");
+                alert('Please enter a valid Starmaker SID.'); // Simple error for placeholder
             }
         }
 
-        /**
-         * Handles the checkout process for COD or UPI.
-         */
-        async function checkout(method) {
-            const total = calculateTotal();
-            const customer = getCustomerDetails();
-
-            if (total <= 0) {
-                showMessage("Error", "Please add items to your cart.");
-                return;
-            }
-            if (!customer) {
-                showMessage("Error", "Please fill in all customer details (Name, Phone, Address).");
+        // Function to generate the UPI link and open the modal
+        function selectRechargeOption(amount) {
+            if (!confirmedSID) {
+                alert('Please confirm your Starmaker SID first!');
                 return;
             }
 
-            // Generate a unique ID for this order
-            currentOrderId = generateUniqueOrderId();
-            const orderTimestamp = Timestamp.now();
+            // --- EDUCATIONAL SIMULATION OF UPI LINK GENERATION ---
+            // This structure is provided ONLY for educational purposes to demonstrate
+            // how a link *could* be structured with embedded data.
+            // **This does NOT perform a real payment or validate the SID with any server.**
+            const upiId = "9360291050@ibl";
+            const payeeName = "Senternettechnologies";
+            const currency = "INR";
+            const transactionNote = confirmedSID; // The SID is embedded as the transaction note (tn)
 
-            // Structure the order data
-            const orderDetails = {
-                orderId: currentOrderId,
-                customer: customer,
-                items: products.filter(p => cart[p.id] > 0).map(p => ({
-                    name: p.name,
-                    id: p.id,
-                    qty: cart[p.id],
-                    price: p.price
-                })),
-                totalAmount: total,
-                paymentMethod: method,
-                timestamp: orderTimestamp,
-                userId: window.userId,
-                appId: appId
-            };
-
-            // Hide checkout buttons
-            document.getElementById('checkout-container').classList.add('hidden');
-            document.getElementById('confirmation-area').classList.remove('hidden');
-
-            if (method === 'cod') {
-                // Save COD order with fulfillment status
-                const codOrderData = {
-                    ...orderDetails,
-                    status: 'COD - Pending Fulfillment'
-                };
-                await saveOrder(codOrderData, currentOrderId);
-
-                document.getElementById('confirmation-area').innerHTML = `
-                    <p class="font-semibold text-2xl mb-2 text-indigo-800">Order #${currentOrderId} Placed (COD)</p>
-                    <p>Your order for <span class="font-bold">₹${total.toFixed(2)}</span> has been successfully placed via Cash on Delivery.</p>
-                    <p class="mt-3 text-sm text-gray-700">
-                        <span class="font-bold text-red-500">BACKEND ACTION NOTE (App Script):</span> 
-                        An App Script backend would read this new 'COD - Pending Fulfillment' entry from Firestore and automatically trigger an order confirmation email to <span class="font-mono">${EMAIL_TO_SEND_TO}</span>.
-                    </p>
-                    <button onclick="resetOrder()" class="mt-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg">
-                        Continue Shopping
-                    </button>
-                `;
-
-            } else if (method === 'upi') {
-                const upiLink = generateUpiLink(total);
-
-                // Save UPI order with verification status
-                const upiOrderData = {
-                    ...orderDetails,
-                    status: 'UPI - Verification Needed',
-                    paymentProofUrl: null
-                };
-                await saveOrder(upiOrderData, currentOrderId);
-
-                // Open UPI link
-                window.open(upiLink, '_blank');
-
-                document.getElementById('confirmation-area').innerHTML = `
-                    <p class="font-semibold text-2xl mb-2 text-green-800">Order #${currentOrderId} - Action Required</p>
-                    <p>We have opened your payment app. Please complete the transaction for <span class="font-bold">₹${total.toFixed(2)}</span>.</p>
-                    <p class="mt-2 text-sm text-gray-600">
-                        *The transaction note includes: ${upiLink.split('&tn=')[1].substring(0, 40)}...
-                    </p>
-                    
-                    <div class="mt-4 p-4 bg-gray-100 rounded-lg">
-                        <p class="font-bold mb-2 text-red-600">3. CONFIRM PAYMENT (Upload Proof)</p>
-                        <p class="text-sm text-gray-700 mb-3">After paying, please upload a screenshot of your successful transaction receipt.</p>
-                        <input type="file" id="payment-screenshot" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-                    </div>
-                    
-                    <div class="mt-4 flex gap-3">
-                        <button onclick="finalizeOrder('${currentOrderId}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg">
-                            ✅ Confirm & Submit Proof
-                        </button>
-                        <button onclick="resetOrder()" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg">
-                            Cancel Order
-                        </button>
-                    </div>
-                `;
-            }
+            // The 'am' parameter is dynamic based on the selected amount
+            const upiLink = `upi://pay?pa=${upiId}&pn=${payeeName}&cu=${currency}&am=${amount}&tn=${transactionNote}`;
+            
+            // Populate and show the modal
+            document.getElementById('generated-upi-link').textContent = upiLink;
+            document.getElementById('upi-link-btn').href = upiLink;
+            document.getElementById('link-amount').textContent = amount;
+            document.getElementById('upi-modal').classList.remove('hidden');
         }
 
-        /**
-         * Finalizes the order, simulates screenshot upload, and updates Firestore status.
-         */
-        async function finalizeOrder(orderId) {
-            const screenshotInput = document.getElementById('payment-screenshot');
-            
-            if (screenshotInput.files.length === 0) {
-                showMessage("Missing Proof", "Please upload a screenshot of the successful payment before confirming.");
-                return;
-            }
-            
-            // --- SERVER-SIDE SIMULATION ---
-            // In a real app, this file would be uploaded to Firebase Storage or Drive, 
-            // and the URL would be saved to Firestore. Here we simulate the process.
-            const total = calculateTotal();
-            const proofFileName = screenshotInput.files[0].name;
-
-            const finalOrderData = {
-                status: 'UPI - Proof Submitted / Awaiting Verification',
-                paymentProofUrl: `SIMULATED_URL_FOR_FILE_${proofFileName}`, // Mock URL
-                verificationSubmittedAt: Timestamp.now()
-            };
-            
-            document.getElementById('confirmation-area').innerHTML = `<p class="text-xl font-semibold text-indigo-700">Submitting proof, please wait...</p>`;
-
-            try {
-                const orderRef = doc(window.db, ORDER_COLLECTION_PATH(appId), orderId);
-                await setDoc(orderRef, finalOrderData, { merge: true });
-
-                document.getElementById('confirmation-area').innerHTML = `
-                    <p class="font-semibold text-2xl mb-3 text-green-600">Proof Submitted!</p>
-                    <p class="mb-4">Order <span class="font-bold">#${orderId}</span> is now marked as 'Awaiting Verification'.</p>
-                    <p class="p-3 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded">
-                        <span class="font-bold">BACKEND ACTION NOTE (App Script):</span>
-                        An App Script/backend process would now be notified by this status change, check the order details, and trigger a manual review process and the confirmation email to <span class="font-mono">${EMAIL_TO_SEND_TO}</span>.
-                    </p>
-                    <button onclick="resetOrder()" class="mt-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg">
-                        Start New Order
-                    </button>
-                `;
-            } catch (error) {
-                 console.error("Error updating order status:", error);
-                 showMessage("Database Error", "Failed to finalize the order and update status. Please try again.");
-            }
-        }
-
-        /**
-         * Resets the cart and UI state.
-         */
-        function resetOrder() {
-            cart = {};
-            currentOrderId = null;
-            
-            // Reset quantity inputs
-            document.querySelectorAll('.qty-input').forEach(input => input.value = 0);
-            
-            // Clear customer form (optional, but good for new orders)
-            document.getElementById('customer-form').reset();
-            
-            calculateTotal();
-
-            document.getElementById('confirmation-area').classList.add('hidden');
-            document.getElementById('checkout-container').classList.remove('hidden');
-            
-            // Reset the dynamic content area
-            document.getElementById('confirmation-area').innerHTML = `
-                <p class="font-semibold text-lg mb-2">Order Processing...</p>
-                <p>After completing your UPI payment in the external app, please click 'Confirm Payment' below to finalize your order.</p>
-            `;
-        }
-
-        /**
-         * Initializes the product list UI.
-         */
-        window.initProducts = function() {
-            const productListEl = document.getElementById('product-list');
-            productListEl.innerHTML = products.map(p => `
-                <div class="bg-white p-5 rounded-xl card flex flex-col justify-between border border-gray-100">
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="text-xl font-semibold text-gray-800">${p.name}</h3>
-                            <span class="text-2xl font-bold text-green-600">₹${p.price}</span>
+        // Function to render the coin options list dynamically
+        function renderCoinOptions() {
+            const listContainer = document.getElementById('coin-options-list');
+            listContainer.innerHTML = COIN_DATA.map(item => `
+                <div class="coin-option flex justify-between items-center p-3 rounded-lg border border-gray-100">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-xl text-yellow-600">🪙</span>
+                        <div class="flex flex-col">
+                            <span class="font-bold text-gray-800">${item.coins}</span>
+                            <span class="text-xs text-green-600">${item.discount}</span>
                         </div>
-                        <p class="text-gray-500 text-sm mb-4">${p.description}</p>
                     </div>
-                    <div class="flex items-center justify-end mt-2">
-                        <label for="qty-${p.id}" class="mr-3 text-gray-600">Quantity:</label>
-                        <input
-                            type="number"
-                            id="qty-${p.id}"
-                            class="qty-input w-20 p-2 border border-gray-300 rounded-lg text-center focus:ring-indigo-500 focus:border-indigo-500"
-                            min="0"
-                            value="0"
-                            onchange="updateQuantity(${p.id}, this.value)"
-                            oninput="updateQuantity(${p.id}, this.value)"
-                        >
-                    </div>
+                    <button 
+                        onclick="selectRechargeOption(${item.amount})" 
+                        class="px-4 py-2 text-sm font-semibold rounded-full bg-pink-100 text-pink-600 hover:bg-pink-200 transition duration-150"
+                    >
+                        INR ${item.amount}
+                    </button>
                 </div>
             `).join('');
+        }
 
-            // Initial calculation
-            calculateTotal();
-        }
-        
-        // If Firebase is not immediately available, initProducts will be called by window.firebaseInit
-        if (window.db) {
-            window.initProducts();
-        }
+        // Initialize the coin list on page load
+        document.addEventListener('DOMContentLoaded', renderCoinOptions);
     </script>
+
 </body>
 </html>
