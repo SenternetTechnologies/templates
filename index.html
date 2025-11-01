@@ -3,373 +3,499 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coin Recharge</title>
-    <!-- Link to Tailwind CSS (CDN for simplicity) -->
+    <title>StarMaker Coin Recharge Portal</title>
+    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styles for a cleaner look */
-        .coin-option {
-            transition: background-color 0.2s;
-        }
-        .coin-option:hover {
-            background-color: #f7f7f7;
-        }
-        /* Ensure the body is responsive */
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Style for the API response box */
-        #raw-response-output {
-            max-height: 200px;
-            white-space: pre-wrap; /* Ensures long lines wrap, but preserves formatting */
-            word-wrap: break-word; /* Breaks long words */
+        /* Custom scrollbar and aesthetics */
+        .output-area {
+            min-height: 150px;
+            max-height: 400px;
             overflow-y: auto;
-            border: 1px solid #374151; /* Dark border */
+            transition: all 0.3s ease;
+        }
+        .font-inter { font-family: 'Inter', sans-serif; }
+
+        /* Style for coin packages */
+        .coin-package {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .coin-package:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.4), 0 4px 6px -2px rgba(236, 72, 153, 0.1);
+        }
+        
+        /* Custom styling for the "Contact Seller" link in the header */
+        .contact-link {
+            transition: color 0.2s;
+            font-weight: 600;
         }
     </style>
-</head>
-<body class="bg-gray-50 min-h-screen">
-
-    <div class="max-w-md mx-auto bg-white shadow-lg sm:rounded-xl">
-        
-        <!-- Header Section -->
-        <header class="p-4 flex justify-between items-center border-b border-gray-100">
-            <div class="flex items-center space-x-2">
-                <!-- Placeholder Profile Image -->
-                <img src="https://improxy.starmakerstudios.com/tools/im/200/production/users/844424932338727/profile.jpg?ts=1760872638" alt="User Profile" class="w-10 h-10 rounded-full object-cover">
-                <div class="flex items-center space-x-1">
-                    <span class="font-semibold text-gray-900">🔥𓆩🅲🆂𓆪🔥🖤𓅋🄴ує༗𝆺𝅥𒁍</span>
-                    <!-- VIP/Level Tag -->
-                    <span class="text-xs bg-purple-500 text-white rounded-full px-2 py-0.5 font-medium">49</span>
-                </div>
-            </div>
-            <a href="#" class="text-red-500 font-medium text-sm hover:text-red-700 transition">Contact Coin seller</a>
-        </header>
-
-        <!-- SID Input Form -->
-        <div id="sid-input-section" class="p-4 border-b border-gray-100">
-            <h3 class="font-semibold mb-3 text-gray-700 text-lg">Enter Starmaker SID</h3>
-            
-            <!-- Message Box for errors and warnings (instead of alert()) -->
-            <div id="sid-message-box" class="hidden p-3 mb-3 text-sm rounded-lg font-medium transition-all duration-300"></div>
-
-            <div class="flex flex-col space-y-3">
-                <input type="number" pattern="[0-9]*" id="user_sid_input" placeholder="Enter your Starmaker SID number" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 transition duration-150">
-                <button onclick="handleSIDSubmission()" id="confirm-btn" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-lg transition duration-150 shadow-md hover:shadow-lg active:scale-[.99]">
-                    Confirm
-                </button>
-            </div>
-        </div>
-        
-        <!-- SID Confirmation Success Message (Will be revealed after modal confirmation) -->
-        <div id="sid-confirmation-message" class="hidden p-4 bg-green-100 text-green-700 text-sm font-medium rounded-b-xl transition-all duration-300">
-            <p>✅ SID **<span id="confirmed-sid" class="font-extrabold"></span>** is confirmed. Please select a recharge option below.</p>
-        </div>
-
-
-        <!-- Recharge Options Section -->
-        <div id="recharge-section" class="hidden p-4">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-800">Recharge Option</h2>
-                <!-- Region Selector Placeholder -->
-                <div class="flex items-center space-x-1 text-sm text-gray-500 hover:text-gray-700 transition cursor-pointer">
-                    <span>India</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                    </svg>
-                </div>
-            </div>
-
-            <!-- UPI Last Used Indicator -->
-            <div class="p-3 mb-4 flex justify-between items-center bg-indigo-50 rounded-xl relative border border-indigo-100">
-                <div class="flex items-center space-x-3">
-                    <!-- Placeholder UPI Icons -->
-                    <img src="https://placehold.co/20x20/5c5cff/ffffff?text=P" alt="Paytm Icon" class="w-5 h-5 rounded">
-                    <img src="https://placehold.co/20x20/00ff00/ffffff?text=G" alt="GPay Icon" class="w-5 h-5 rounded">
-                    <span class="font-semibold text-gray-800">UPI</span>
-                </div>
-                <span class="text-sm text-yellow-600 font-extrabold">100 INR = 🪙84</span>
-                <div class="absolute top-0 right-0 bg-orange-500 text-white text-xs font-semibold px-2 py-0.5 rounded-tr-xl rounded-bl-xl">
-                    Last Used
-                </div>
-            </div>
-            
-            <p class="text-xs text-gray-500 mb-4 text-center p-2 bg-yellow-50 rounded-lg">
-                <span class="font-bold">NOTICE:</span> Only a few orders might receive coins late within hours, please don't worry.
-            </p>
-
-            <!-- Coin Options List (Dynamically Rendered) -->
-            <div id="coin-options-list" class="space-y-2">
-                <!-- Coin options will be injected here -->
-            </div>
-        </div>
-
-    </div>
-
-    <!-- API Response Confirmation Modal (Updated) -->
-    <div id="user-details-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 transition-opacity duration-300">
-        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full transform transition-transform duration-300">
-            <h3 class="text-xl font-bold mb-4 text-gray-800 text-center">Review Account Details</h3>
-            
-            <!-- Loading Indicator -->
-            <div id="details-loading" class="text-center p-8 text-gray-500">
-                <svg class="animate-spin h-6 w-6 text-pink-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <p class="mt-2">Fetching live data...</p>
-            </div>
-
-            <!-- API Response Content -->
-            <div id="modal-api-response" class="hidden">
-                <p class="text-sm font-semibold mb-2 text-gray-700">Raw API Response for SID: <span id="modal-sid-display" class="font-extrabold text-pink-600"></span></p>
-                <pre id="raw-response-output" class="text-xs bg-gray-800 text-green-300 p-3 rounded-lg overflow-x-auto h-40"></pre>
-                <p class="text-sm text-center text-gray-600 font-medium pt-4 border-t w-full mt-4">Do you confirm this account is correct based on the details above?</p>
-            </div>
-            
-            <div class="mt-6 flex space-x-3" id="modal-actions">
-                <button onclick="confirmAccountDetails(true)" class="flex-1 text-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition duration-150 shadow-md active:scale-[.98]">
-                    Yes, Proceed
-                </button>
-                <button onclick="confirmAccountDetails(false)" class="flex-1 text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-lg transition duration-150 active:scale-[.98]">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal for UPI Link -->
-    <div id="upi-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 transition-opacity duration-300">
-        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full transform transition-transform duration-300 scale-100">
-            <h3 class="text-xl font-bold mb-4 text-gray-800">🔗 Payment Link Generated</h3>
-            <p class="text-sm mb-4 text-gray-600">Click the button below to open your UPI app for payment. **Your SID is embedded in the link.**</p>
-            
-            <div class="bg-yellow-50 p-3 rounded-lg mb-4 break-words border border-yellow-200">
-                <p class="text-xs font-mono text-yellow-700" id="generated-upi-link">❤️Contact admin for become coin seller</p>
-            </div>
-            
-            <a id="upi-link-btn" href="#" target="_blank" class="block w-full text-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition duration-150 shadow-lg shadow-green-200 active:shadow-none">
-                Open UPI App for ₹<span id="link-amount">0</span>
-            </a>
-            
-            <button onclick="document.getElementById('upi-modal').classList.add('hidden')" class="mt-4 w-full text-sm text-gray-500 hover:text-gray-900 transition font-medium">Close / Cancel</button>
-        </div>
-    </div>
-
-
     <script>
+        // Global variables for the current user session
+        let currentStageName = '';
+        let currentUserId = '';
+        const LOCAL_STORAGE_KEY = 'starmaker_last_user_data';
+
+        // --- COIN AND ADMIN DATA (SENTERNET TECHNOLOGIES) ---
         const COIN_DATA = [
-            { coins: 42, discount: "16.00% off", amount: 50 },
-            { coins: 84, discount: "16.00% off", amount: 100 },
-            { coins: 429, discount: "18.45% off", amount: 500 },
-            { coins: 871, discount: "20.38% off", amount: 1000 },
-            { coins: 4421, discount: "22.35% off", amount: 5000 },
-            { coins: 8842, discount: "22.34% off", amount: 10000 },
-            { coins: 17820, discount: "23.31% off", amount: 20000 },
+            { coins: 42, discount: "16.00% off", amount: 50, currency: "INR" },
+            { coins: 84, discount: "16.00% off", amount: 100, currency: "INR" },
+            { coins: 429, discount: "18.45% off", amount: 500, currency: "INR" },
+            { coins: 871, discount: "20.38% off", amount: 1000, currency: "INR" },
+            { coins: 4421, discount: "22.35% off", amount: 5000, currency: "INR" },
+            { coins: 8842, discount: "22.34% off", amount: 10000, currency: "INR" },
+            { coins: 17820, discount: "23.31% off", amount: 20000, currency: "INR" },
         ];
+        
+        // Admin/Seller UPI Configuration
+        const UPI_ID = "senternettechnologies@upi"; // Placeholder based on company details
+        const PAYEE_NAME = "Senthilkumar - SENTERNET TECHNOLOGIES";
+        const CONTACT_WHATSAPP = "+91 81900 38085";
 
-        let confirmedSID = '';
-
-        // Function to display temporary messages (errors/warnings) instead of alert()
-        function showMessage(type, message) {
-            const messageBox = document.getElementById('sid-message-box');
-            messageBox.textContent = message;
-            messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-yellow-100', 'text-yellow-700', 'bg-green-100', 'text-green-700');
-            
-            if (type === 'error') {
-                messageBox.classList.add('bg-red-100', 'text-red-700');
-            } else if (type === 'warning') {
-                messageBox.classList.add('bg-yellow-100', 'text-yellow-700');
-            } else if (type === 'success') {
-                messageBox.classList.add('bg-green-100', 'text-green-700');
-            }
-
-            // Hide message after 5 seconds
-            setTimeout(() => {
-                messageBox.classList.add('hidden');
-            }, 5000);
+        // Function to display user messages (replacing alerts)
+        function displayMessage(type, message) {
+            const messageBox = document.getElementById('message-box');
+            messageBox.classList.remove('hidden'); 
+            messageBox.innerHTML = message;
+            messageBox.className = 'p-3 rounded-xl text-sm transition-all duration-300 mt-6 ' +
+                                   (type === 'error' ? 'bg-red-100 text-red-700 shadow-md' : (type === 'manual-recharge' ? 'bg-yellow-100 text-yellow-800 shadow-lg' : 'bg-green-100 text-green-700 shadow-md'));
         }
 
-        /**
-         * Function to handle the SID submission (Stage 1: Live Verification)
-         * This uses the fetch logic provided by the user.
-         */
-        async function handleSIDSubmission() {
-            const sidInput = document.getElementById('user_sid_input');
-            const confirmBtn = document.getElementById('confirm-btn');
-            const modal = document.getElementById('user-details-modal');
-            const loading = document.getElementById('details-loading');
-            const responseContainer = document.getElementById('modal-api-response');
-            const rawOutput = document.getElementById('raw-response-output');
-            const sid = sidInput.value.trim();
-
-            // 1. Validation
-            if (sid.length < 6 || !/^\d+$/.test(sid)) {
-                showMessage('error', '❌ Please enter a valid numeric Starmaker SID (minimum 6 digits).');
+        // --- UPI Link Generation Logic ---
+        function selectCoinPackage(coins, amount, currency) {
+            if (!currentUserId || !currentStageName) {
+                displayMessage('error', 'Please verify a user profile first.');
                 return;
             }
             
-            // 2. UI State: Disable button, show modal
-            confirmBtn.disabled = true;
-            confirmBtn.textContent = 'Verifying...';
-            responseContainer.classList.add('hidden');
-            loading.classList.remove('hidden');
-            modal.classList.remove('hidden');
+            const transactionNote = encodeURIComponent(`StarMaker Recharge of ${coins} Coins for SID: ${currentUserId}`);
+            const upiLink = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&cu=${currency}&am=${amount}&tn=${transactionNote}`;
+            const whatsappLink = `https://wa.me/${CONTACT_WHATSAPP.replace(/\s/g, '')}`;
 
-            // 3. API Request Setup (Replicating Python/User Script)
-            const url = "https://pay.starmakerstudios.com/rapid/user";
-            const staticParams = {
-                'category': "6",
-                'id': sid, // Dynamically set by user input
-                'ts': "1740931730"
-            };
-
-            const params = new URLSearchParams(staticParams).toString();
-            const fullUrl = `${url}?${params}`;
-
-            const headers = {
-                // User-Agent is crucial for mimicking the mobile environment
-                'User-Agent': "Mozilla/5.0 (Linux; U; Android 14; en-in; SM-E546B Build/UP1A.231005.007) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.88 Mobile Safari/537.36 HeyTapBrowser/45.11.5.1",
-                'Accept': "application/json, text/plain, */*",
-                // Origin and Referer are set but browser might restrict them
-                'Origin': "https://m.starmakerstudios.com",
-                'Referer': "https://m.starmakerstudios.com/",
-                'Accept-Language': "en-IN,en-US;q=0.9,en;q=0.8"
-            };
-
-            try {
-                // 4. Execute Fetch Request
-                const response = await fetch(fullUrl, {
-                    method: 'GET',
-                    headers: headers,
-                    mode: 'cors'
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`HTTP Error ${response.status}: ${errorText.substring(0, 100)}...`);
-                }
-
-                const responseText = await response.text();
-                let displayContent;
-
-                // Attempt to pretty-print JSON, otherwise show raw text
-                try {
-                    const jsonObject = JSON.parse(responseText);
-                    displayContent = JSON.stringify(jsonObject, null, 2);
-                } catch (e) {
-                    displayContent = responseText;
-                }
-
-                // 5. Success: Populate Modal
-                document.getElementById('modal-sid-display').textContent = sid;
-                rawOutput.textContent = displayContent;
-                
-                loading.classList.add('hidden');
-                responseContainer.classList.remove('hidden');
-
-            } catch (error) {
-                // 6. Error: Hide modal, reset button, show error message
-                console.error('Fetch Error:', error);
-                modal.classList.add('hidden');
-                showMessage('error', `❌ Request Failed. Details: ${error.message || 'Could not connect to server or request was blocked.'}`);
-                confirmBtn.disabled = false;
-                confirmBtn.textContent = 'Confirm';
-            }
-        }
-
-        // Function to handle account confirmation from within the modal (Stage 2: Final Confirmation)
-        function confirmAccountDetails(isCorrect) {
-            const modal = document.getElementById('user-details-modal');
-            const sidInput = document.getElementById('user_sid_input');
-            const confirmBtn = document.getElementById('confirm-btn');
+            const message = `
+                <div class="p-4 rounded-xl border-4 border-yellow-400">
+                    <p class="font-bold text-xl text-yellow-800 mb-3 text-center">Payment Required: ${currency} ${amount.toLocaleString('en-IN')}.00</p>
+                    <p class="text-sm text-yellow-700 mb-4">
+                        To top-up <span class="font-extrabold">${coins.toLocaleString('en-IN')} Gold Coins</span> for <span class="font-extrabold text-pink-700">${currentStageName}</span>, click below to proceed with UPI payment.
+                    </p>
+                    <a href="${upiLink}" target="_blank" class="mt-2 w-full flex justify-center items-center py-3 bg-green-600 text-white font-extrabold rounded-lg shadow-xl hover:bg-green-700 transition transform hover:scale-[1.01]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm12 10H4l3.5-4.5 2.5 3.5 3.5-4.5 4.5 5.5z" /></svg>
+                        Pay INR ${amount.toLocaleString('en-IN')} Now
+                    </a>
+                    <p class="text-xs mt-4 text-gray-700 text-center">
+                        Seller: ${PAYEE_NAME}. UPI ID: ${UPI_ID}.
+                    </p>
+                    <p class="text-xs mt-1 text-red-600 font-semibold text-center">
+                        <span class="font-extrabold">ACTION REQUIRED:</span> After successful payment, <a href="${whatsappLink}" target="_blank" class="text-red-800 underline">contact SENTERNET TECHNOLOGIES on WhatsApp</a> for instant top-up.
+                    </p>
+                </div>
+            `;
             
-            modal.classList.add('hidden');
-
-            if (isCorrect) {
-                // The SID is already in the modal display area, use it for confirmation
-                const sid = document.getElementById('modal-sid-display').textContent; 
-                confirmedSID = sid;
-                
-                // Finalize confirmation state
-                document.getElementById('confirmed-sid').textContent = sid;
-                document.getElementById('sid-confirmation-message').classList.remove('hidden');
-                document.getElementById('recharge-section').classList.remove('hidden');
-
-                confirmBtn.textContent = 'Confirmed';
-                confirmBtn.disabled = true;
-                sidInput.disabled = true;
-                sidInput.classList.add('bg-gray-100');
-                
-                // Scroll to recharge section
-                document.getElementById('recharge-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                showMessage('success', '✅ Account verified. Select your recharge amount.');
-
-            } else {
-                // If canceled, clear input and reset button state
-                confirmedSID = '';
-                sidInput.value = '';
-                confirmBtn.disabled = false;
-                confirmBtn.textContent = 'Confirm';
-                sidInput.disabled = false;
-                sidInput.classList.remove('bg-gray-100');
-                sidInput.focus();
-                
-                showMessage('warning', '⚠️ Please re-enter or correct your SID.');
-            }
+            displayMessage('manual-recharge', message);
         }
 
-        // Function to generate the UPI link and open the modal
-        function selectRechargeOption(amount) {
-            if (!confirmedSID) {
-                showMessage('warning', '⚠️ Please confirm your Starmaker SID first before selecting an amount.');
-                document.getElementById('user_sid_input').focus();
-                return;
-            }
 
-            // UPI Link Generation: The link is only passed to the final UPI Modal, not shown on the main page.
-            const upiId = "senthilkumarhari9843@okhdfcbank";
-            const payeeName = "Senternettechnologies";
-            const currency = "INR";
-            // Uses the submitted and confirmed SID for the transaction note (tn)
-            const transactionNote = confirmedSID; 
+        // --- Coin Package Rendering ---
+        function renderCoinPackages() {
+            const container = document.getElementById('coin-package-list');
+            let html = '';
+            COIN_DATA.forEach(p => {
+                const isBestDeal = p.coins > 10000;
+                html += `
+                    <div 
+                        class="coin-package bg-white p-6 rounded-xl shadow-lg border-2 ${isBestDeal ? 'border-pink-500 ring-2 ring-pink-300' : 'border-gray-100'} transition duration-200 transform hover:scale-[1.03]"
+                        onclick="selectCoinPackage(${p.coins}, ${p.amount}, '${p.currency || 'INR'}')"
+                    >
+                        <div class="flex flex-col justify-start mb-4">
+                            ${isBestDeal ? '<span class="text-xs bg-red-500 text-white font-bold px-2 py-0.5 rounded-full absolute -top-2 right-2 shadow-md">BEST VALUE</span>' : ''}
+                            <span class="text-4xl font-extrabold text-yellow-600 flex items-center">
+                                <span class="mr-2">💰</span> ${p.coins.toLocaleString('en-IN')}
+                            </span>
+                            <span class="text-sm font-semibold text-green-500 mt-1">${p.discount}</span>
+                        </div>
+                        
+                        <p class="text-lg font-bold text-gray-800 mb-4">Price: <span class="text-pink-600 font-extrabold">INR ${p.amount.toLocaleString('en-IN')}</span></p>
 
-            // The 'am' parameter is dynamic based on the selected amount
-            const upiLink = `upi://pay?pa=${upiId}&pn=${payeeName}&cu=${currency}&am=${amount}&tn=${transactionNote}`;
+                        <button class="mt-2 w-full py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-pink-700 transition shadow-md">
+                            Buy Now
+                        </button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+
+        // Function to render the detailed visual user data card
+        function displayVisualData(userInfo) {
+            const outputArea = document.getElementById('response-output');
+            const rechargeContainer = document.getElementById('recharge-form-container');
+            const headerProfile = document.getElementById('header-profile');
+            const visualizeBtn = document.getElementById('visualize-btn');
             
-            // Populate and show the modal
-            document.getElementById('generated-upi-link').textContent = upiLink;
-            document.getElementById('upi-link-btn').href = upiLink;
-            document.getElementById('link-amount').textContent = amount;
-            document.getElementById('upi-modal').classList.remove('hidden');
-        }
+            // 1. Prepare output area for visual card
+            outputArea.classList.remove('bg-gray-800', 'text-green-300', 'bg-red-100', 'text-red-700', 'p-4', 'font-mono');
+            outputArea.classList.add('p-0', 'bg-white', 'text-gray-800'); 
+            outputArea.style.whiteSpace = 'normal';
+            outputArea.style.wordWrap = 'normal';
+            visualizeBtn.style.display = 'none'; // Hide the "Start Recharge" button when visual data is shown
 
-        // Function to render the coin options list dynamically
-        function renderCoinOptions() {
-            const listContainer = document.getElementById('coin-options-list');
-            listContainer.innerHTML = COIN_DATA.map(item => `
-                <div class="coin-option flex justify-between items-center p-3 rounded-xl border border-gray-200 shadow-sm">
-                    <div class="flex items-center space-x-3">
-                        <span class="text-2xl text-yellow-500">🪙</span>
-                        <div class="flex flex-col">
-                            <span class="font-bold text-gray-800">${item.coins}</span>
-                            <span class="text-xs text-green-600 font-medium">${item.discount}</span>
+            // Data extraction
+            const sid = userInfo.id || 'N/A';
+            const stageName = userInfo.stage_name || userInfo.name || 'N/A'; 
+            const profileImage = userInfo.profile_image || userInfo.headPic || 'https://placehold.co/150x150/1D4ED8/ffffff?text=User';
+            const level = userInfo.level || 'N/A';
+            const country = userInfo.country || 'Unknown';
+            const vipStatus = (userInfo.vip === 'vip' ? 'VIP Member' : (userInfo.vip === 'no_vip' ? 'Standard' : 'N/A'));
+            const rewardRate = userInfo.reward_rate ? `${userInfo.reward_rate}%` : '0%';
+            const canJoin = (userInfo.can_join_make_connection === 'true' ? 'Yes' : (userInfo.can_join_make_connection === 'false' ? 'No' : 'N/A'));
+            const uid = userInfo.uid || 'N/A'; 
+            const category = userInfo.category || 'N/A';
+            
+            // Update global variables for the recharge function
+            currentStageName = stageName;
+            currentUserId = sid;
+            
+            // Update the NEW HEADER with user details (using a static image as requested previously)
+            const headerImage = "https://improxy.starmakerstudios.com/tools/im/200/production/users/844424932338727/profile.jpg?ts=1760872638";
+            headerProfile.innerHTML = `
+                <img src="${headerImage}" alt="User Profile" class="w-10 h-10 rounded-full object-cover border-2 border-gray-300">
+                <div class="flex items-center space-x-1">
+                    <span class="font-semibold text-gray-900 truncate max-w-[100px] sm:max-w-xs">${stageName}</span>
+                    <span class="text-xs bg-purple-500 text-white rounded-full px-2 py-0.5 font-medium">${level}</span>
+                </div>
+            `;
+
+
+            // Construct the main profile card HTML with all categories
+            const visualHtml = `
+                <div class="p-6 bg-white rounded-xl shadow-2xl border-4 border-blue-500/20 max-w-lg mx-auto">
+                    <h3 class="text-2xl font-extrabold text-green-700 mb-6 text-center border-b pb-3">
+                        <span class="mr-2">&#x2714;</span> Profile Verified: <span class="text-blue-600">${stageName}</span>
+                    </h3>
+
+                    <!-- Image & Stage Name -->
+                    <div class="flex flex-col items-center mb-6">
+                        <div class="w-28 h-28 mb-3">
+                            <img 
+                                src="${profileImage}" 
+                                onerror="this.onerror=null;this.src='https://placehold.co/150x150/1D4ED8/ffffff?text=User';"
+                                alt="${stageName}'s Profile Picture"
+                                class="w-full h-full object-cover rounded-full border-4 border-blue-600 shadow-xl"
+                            >
                         </div>
                     </div>
-                    <button 
-                        onclick="selectRechargeOption(${item.amount})" 
-                        class="px-5 py-2 text-md font-semibold rounded-full bg-pink-500 text-white hover:bg-pink-600 transition duration-150 shadow-md active:scale-[.98]"
-                    >
-                        INR ${item.amount}
-                    </button>
+
+                    <!-- Detailed Info Grid - Visualizing all fields -->
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <!-- ID Fields -->
+                        <div class="p-3 bg-blue-50 rounded-lg col-span-2">
+                            <p class="font-semibold text-blue-600">StarMaker ID (SID)</p>
+                            <p class="font-mono text-gray-800 break-all text-base">${sid}</p>
+                        </div>
+                        <div class="p-3 bg-blue-50 rounded-lg">
+                            <p class="font-semibold text-blue-600">Unique ID (UID)</p>
+                            <p class="font-mono text-gray-800 break-all">${uid}</p>
+                        </div>
+                        <div class="p-3 bg-blue-50 rounded-lg">
+                            <p class="font-semibold text-blue-600">Category</p>
+                            <p class="font-bold text-gray-900">${category}</p>
+                        </div>
+                        
+                        <!-- Status Fields -->
+                        <div class="p-3 bg-gray-100 rounded-lg">
+                            <p class="font-semibold text-gray-700">Country</p>
+                            <p class="font-bold text-gray-900">${country}</p>
+                        </div>
+                        <div class="p-3 bg-gray-100 rounded-lg">
+                            <p class="font-semibold text-gray-700">Level</p>
+                            <p class="font-bold text-gray-900 text-xl">${level}</p>
+                        </div>
+                        
+                        <!-- VIP & Connection -->
+                        <div class="p-3 bg-pink-100 rounded-lg">
+                            <p class="font-semibold text-pink-700">VIP Status</p>
+                            <p class="font-bold text-gray-900">${vipStatus}</p>
+                        </div>
+                        <div class="p-3 bg-pink-100 rounded-lg">
+                            <p class="font-semibold text-pink-700">Reward Rate</p>
+                            <p class="font-bold text-gray-900">${rewardRate}</p>
+                        </div>
+
+                        <!-- Connection Status -->
+                        <div class="p-3 bg-green-100 rounded-lg col-span-2">
+                            <p class="font-semibold text-green-700">Can Join Connection?</p>
+                            <p class="font-bold text-gray-900">${canJoin}</p>
+                        </div>
+                    </div>
                 </div>
-            `).join('');
+            `;
+            
+            outputArea.innerHTML = visualHtml;
+
+            // 4. Show the Recharge Form and render coin packages
+            rechargeContainer.classList.remove('hidden');
+            renderCoinPackages(); 
         }
 
-        // Initialize the coin list on page load
-        document.addEventListener('DOMContentLoaded', renderCoinOptions);
-    </script>
+        // Function to visualize data, either from manual paste or from successful fetch data stored in localStorage
+        function visualizeManualData() {
+            const outputArea = document.getElementById('response-output');
+            const visualizeBtn = document.getElementById('visualize-btn');
+            
+            document.getElementById('message-box').classList.add('hidden');
+            document.getElementById('recharge-form-container').classList.add('hidden');
+            
+            let rawText = outputArea.textContent.trim();
+            
+            if (!rawText || rawText.includes('Verification Failed') || rawText.includes('Enter a User ID')) {
+                rawText = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (!rawText) {
+                    displayMessage('error', 'No profile data found to start recharge. Please submit a User ID first or paste the data below.');
+                    return;
+                }
+            }
+            
+            // Temporarily display raw data 
+            outputArea.classList.remove('bg-white', 'p-0', 'text-gray-800', 'bg-red-100', 'text-red-700');
+            outputArea.classList.add('bg-gray-800', 'p-4', 'text-green-300', 'font-mono');
+            outputArea.style.whiteSpace = 'pre-wrap';
+            outputArea.style.wordWrap = 'break-word';
+            outputArea.textContent = rawText; 
 
+            visualizeBtn.style.display = 'block'; 
+
+            try {
+                const jsonObject = JSON.parse(rawText);
+
+                // Determine the location of the user info based on the object structure
+                const userInfo = jsonObject.user || (jsonObject.data && jsonObject.data.userInfo);
+                if (!userInfo) {
+                    throw new Error('Data structure not recognized. Ensure it contains "data.userInfo" or "user" property.');
+                }
+                
+                // On successful visualization, the visualizer will hide the raw text and button
+                displayVisualData(userInfo);
+                displayMessage('success', 'Profile data successfully prepared! Ready to recharge.');
+
+            } catch (error) {
+                console.error('Manual Data Error:', error);
+                
+                outputArea.classList.remove('bg-gray-800', 'p-4', 'text-green-300');
+                outputArea.classList.add('bg-red-100', 'text-red-700');
+                outputArea.textContent = `Verification Failed. The data you provided is not readable. Please verify the format.`;
+                displayMessage('error', 'Verification failed: The data format is invalid. See box for details.');
+            }
+        }
+
+
+        async function fetchUserData() {
+            const userIdInput = document.getElementById('user_id_input');
+            const outputArea = document.getElementById('response-output');
+            const submitButton = document.getElementById('submit-btn');
+            const messageBox = document.getElementById('message-box');
+            const rechargeContainer = document.getElementById('recharge-form-container');
+            const visualizeBtn = document.getElementById('visualize-btn');
+            
+            // --- Reset for Loading State ---
+            messageBox.classList.add('hidden');
+            rechargeContainer.classList.add('hidden'); 
+            visualizeBtn.style.display = 'none'; 
+            
+            outputArea.classList.remove('bg-white', 'p-0', 'text-gray-800', 'bg-red-100', 'text-red-700');
+            outputArea.classList.add('bg-gray-800', 'p-4', 'text-yellow-400', 'font-mono');
+            outputArea.style.whiteSpace = 'pre-wrap';
+            outputArea.style.wordWrap = 'break-word';
+            outputArea.textContent = 'Verifying Profile Details... Please wait.';
+
+            const userId = userIdInput.value.trim();
+
+            if (!userId) {
+                displayMessage('error', 'Please enter a valid User ID for profile verification.');
+                outputArea.textContent = 'Verification Failed. Enter a valid ID.';
+                // Re-enable button
+                submitButton.disabled = false;
+                submitButton.textContent = 'Verify Profile';
+                return;
+            }
+
+            // Disable button during fetch
+            submitButton.disabled = true;
+            submitButton.textContent = 'Verifying...';
+
+            // --- SIMULATED RESPONSE for "perfect new profile fetch system" ---
+            // Note: The actual API call is external to this sandbox, so we use a mock.
+            try {
+                const mockSuccessResponse = {
+                    "code": 0,
+                    "message": "Success",
+                    "user": {
+                        "category": "6",
+                        "id": userId, // Dynamically use the input ID
+                        "uid": "844424932338727",
+                        "stage_name": "🔥𓆩🅲🆂𓆪🔥🖤𓅋🄴ує༗𝆺𝅥𒁍", // The requested name
+                        "country": "IN",
+                        "profile_image": "https://improxy.starmakerstudios.com/tools/im/200/production/users/844424932338727/profile.jpg?ts=1761994660",
+                        "level": "49", // The requested level
+                        "can_join_make_connection": "false",
+                        "reward_rate": "0",
+                        "vip": "vip"
+                    }
+                };
+
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                const jsonObject = mockSuccessResponse;
+                
+                if (jsonObject.code === 0 && jsonObject.user) {
+                    
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(jsonObject, null, 2));
+                    displayVisualData(jsonObject.user); 
+                    
+                    displayMessage('success', 'Profile Verified Done! Ready for Coin Recharge.');
+
+                } else {
+                    const rawData = JSON.stringify(jsonObject, null, 2);
+                    localStorage.setItem(LOCAL_STORAGE_KEY, rawData);
+
+                    outputArea.classList.remove('text-yellow-400', 'bg-gray-800');
+                    outputArea.classList.add('bg-red-100', 'text-red-700');
+                    outputArea.textContent = `Verification Failed. The service returned an issue. Response: ${jsonObject.message}`;
+                    
+                    visualizeBtn.style.display = 'block';
+                    displayMessage('error', 'Verification Failed. Profile details could not be loaded successfully.');
+                }
+                
+            } catch (error) {
+                console.error('Request Error:', error);
+                outputArea.classList.remove('bg-gray-800', 'text-yellow-400');
+                outputArea.classList.add('bg-red-100', 'text-red-700');
+                outputArea.textContent = `Verification Failed. Check your network connection.`;
+                visualizeBtn.style.display = 'block'; 
+                displayMessage('error', 'Connection Error. Please ensure a stable internet connection.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Verify Profile';
+            }
+        }
+        
+        // Initialize on load
+        window.onload = function() {
+            const outputArea = document.getElementById('response-output');
+            const lastData = localStorage.getItem(LOCAL_STORAGE_KEY);
+            
+            if (lastData) {
+                try {
+                    const jsonObject = JSON.parse(lastData);
+                    const userInfo = jsonObject.user || (jsonObject.data && jsonObject.data.userInfo);
+                    if (userInfo) {
+                         displayVisualData(userInfo);
+                         displayMessage('success', 'Last verified profile re-loaded. Ready to Recharge!');
+                         return;
+                    }
+                } catch (e) {
+                    // Fail gracefully
+                }
+            }
+            // If no data or failed to visualize, set default message and hide manual button
+            document.getElementById('header-profile').innerHTML = `
+                <img src="https://placehold.co/40x40/ccc/ffffff?text=U" alt="Placeholder" class="w-10 h-10 rounded-full object-cover border-2 border-gray-300">
+                <span class="font-semibold text-gray-400">Not Verified</span>
+            `;
+            outputArea.textContent = 'Enter a User ID and submit to verify profile.';
+            document.getElementById('visualize-btn').style.display = 'none';
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-inter min-h-screen p-4 sm:p-8 flex flex-col items-center justify-start">
+
+    <div class="w-full max-w-xl bg-white shadow-2xl rounded-xl border border-gray-200 mt-6">
+        
+        <!-- Header Section (Integrated from previous request) -->
+        <header class="p-4 flex justify-between items-center border-b border-gray-100 bg-white rounded-t-xl">
+            <div id="header-profile" class="flex items-center space-x-2">
+                <!-- Profile content rendered by JS on load/verify -->
+            </div>
+            <a href="https://wa.me/918190038085" target="_blank" class="text-red-500 contact-link text-sm hover:text-red-700 transition">
+                Contact Coin seller
+            </a>
+        </header>
+        
+        <!-- Main Content -->
+        <div class="p-6 md:p-8">
+            <h1 class="text-3xl font-extrabold text-blue-800 mb-2">StarMaker Coin Recharge Portal</h1>
+            <p class="text-gray-600 mb-6 border-b pb-4">
+                Enter the User ID to verify the profile details and view the coin purchase options.
+            </p>
+
+            <!-- Input Section -->
+            <div class="mb-6">
+                <label for="user_id_input" class="block text-sm font-semibold text-gray-700 mb-2">StarMaker User ID (SID)</label>
+                <input 
+                    type="text" 
+                    id="user_id_input" 
+                    placeholder="e.g., 123456789" 
+                    class="w-full p-3 border border-gray-300 rounded-xl shadow-inner focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+                >
+            </div>
+
+            <!-- Action Button -->
+            <button 
+                id="submit-btn"
+                onclick="fetchUserData()"
+                class="w-full py-3 px-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 transform hover:scale-[1.005]"
+            >
+                Verify Profile
+            </button>
+
+            <!-- Message Box (placed here to show messages related to Fetch/Recharge) -->
+            <div id="message-box" class="hidden">
+                <!-- Messages will appear here -->
+            </div>
+
+            <!-- Output Section & Profile Visualizer -->
+            <div class="mt-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-3 border-b pb-2">Verified Profile Card & Status</h2>
+                
+                <!-- This area displays the visual card or error message -->
+                <div id="response-output" class="output-area bg-gray-800 text-green-300 p-4 rounded-xl text-xs font-mono shadow-inner">
+                    Enter a User ID and submit to verify profile.
+                </div>
+
+                <!-- Manual Visualization/Recharge Button -->
+                <button 
+                    id="visualize-btn"
+                    onclick="visualizeManualData()"
+                    class="mt-4 w-full py-2 px-4 bg-purple-600 text-white font-semibold rounded-xl shadow-md hover:bg-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50 transition duration-150"
+                    style="display: none;"
+                >
+                    Start Recharge (from pasted data)
+                </button>
+            </div>
+        </div>
+
+        <!-- Coin Recharge Form (Hidden until successful verification) -->
+        <div id="recharge-form-container" class="hidden p-6 md:p-8 pt-0">
+            <h2 class="text-2xl font-extrabold text-pink-700 mb-6 border-b pb-2">
+                <span class="mr-2">&#x1F4B0;</span> Select Coin Package (INR)
+            </h2>
+            
+            <!-- Coin Packages List (Replaces old select dropdown) -->
+            <div id="coin-package-list" class="grid grid-cols-2 gap-4 sm:grid-cols-2">
+                <!-- Coin packages rendered here by JS -->
+            </div>
+
+        </div>
+    </div>
+    
+    <!-- Footer with SENTERNET TECHNOLOGIES Contact Details -->
+    <footer class="w-full max-w-xl mt-8 mb-4 p-4 text-center text-xs text-gray-500 border-t border-gray-200 bg-white rounded-xl shadow-lg">
+        <p class="font-bold text-gray-700 mb-1">Service Provided by SENTERNET TECHNOLOGIES</p>
+        <p>Location: Aranthangi | WhatsApp: <a href="https://wa.me/918190038085" target="_blank" class="text-blue-600 hover:underline">+91 81900 38085</a></p>
+        <p>Gmail: <a href="mailto:senternettechnologies@gmail.com" class="text-blue-600 hover:underline">senternettechnologies@gmail.com</a></p>
+    </footer>
 </body>
 </html>
 
